@@ -24,11 +24,11 @@ For the purpose of correctly running the project, we have to follow these steps:
 
 1. [Cloning the repository.](#clonning-repository)
 2. [Using Docker commands.](#docker)
-    1. [Setting environment variables (Works with Docker Compose too)](#env-docker)
+    1. [Setting up the environment variables (Works with Docker Compose too)](#env-docker)
     2. [Running the **`postgresql`** container.](#postgresql-container)
     3. [Build and running the **`api`** container.](#api-container)
 3. [Using Docker Compose commands.](#docker-compose)
-    1. [Setting environment variables](#env-docker-compose)
+    1. [Setting up the environment variables](#env-docker-compose)
     2. [Running all services](#services)
 
 
@@ -46,7 +46,7 @@ For the purpose of correctly running the project, we have to follow these steps:
 <h3 id="docker"></br>Using <bold><code>Docker</code></bold> commands.</h3>
 
 >
-> <h4 id="env-docker"></br>Setting environment variables (Works with Docker Compose too)</h4>
+> <h4 id="env-docker"></br>Setting up the environment variables (Works with Docker Compose too)</h4>
 >
 > ```bash
 > # Using Linux we can use Bash or Zsh
@@ -87,7 +87,7 @@ For the purpose of correctly running the project, we have to follow these steps:
 <h3 id="docker-compose"></br>Using <bold><code>Docker Compose</code></bold> commands.</h3>
 
 >
-> <h4 id="env-docker-compose"></br>Setting environment variables</h4>
+> <h4 id="env-docker-compose"></br>Setting up the environment variables</h4>
 >
 > Create a **`.env`** file and set the environmet variables inside it.
 > 
