@@ -34,7 +34,8 @@ For the purpose of correctly running the project, we have to follow these steps:
 
 <h3 id="clonning-repository"></br>Cloning The Repository</h3>
 
->
+> </br>
+> 
 > ```bash
 > $ cd ./my/repositories/folder/
 > $ git clone git@github.com:heldercruvinel/transactions-routine.git && cd ./transactions-routine
