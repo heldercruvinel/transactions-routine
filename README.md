@@ -88,7 +88,7 @@ For the purpose of correctly running the project, we have to follow these steps:
 >
 > <h4 id="env-docker-compose"></br>Setting environment variables</h4>
 >
-> </br>Create a **`.env`** file and set the environmet variables inside it.
+> Create a **`.env`** file and set the environmet variables inside it.
 > 
 > ```bash
 > # Using Linux we can use Bash or Zsh
@@ -116,7 +116,7 @@ For the purpose of correctly running the project, we have to follow these steps:
 >
 > <h4 id="services"></br>Running all services</h4>
 >
-> </br>Just running the **`api`** service, will run the **`postgresql`** service automatically.
+> Just running the **`api`** service, will run the **`postgresql`** service automatically.
 > 
 > ```bash
 > $ docker compose up -d api
