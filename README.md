@@ -1,9 +1,7 @@
 
-> # </br>Transactions Routine</br>
->
-> The project was created to simulate a credit transactions routine.
->
-> </br>
+# </br>Transactions Routine</br>
+
+The project was created to simulate a credit transactions routine.
 
 ## </br>Dependencies
 
