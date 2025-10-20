@@ -7,4 +7,3 @@ RUN ls /bin
 FROM alpine:3.21
 COPY --from=build /bin/api /bin/api
 EXPOSE 8080/tcp
-# ENTRYPOINT [ "api" ]

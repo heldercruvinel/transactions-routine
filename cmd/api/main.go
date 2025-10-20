@@ -1,33 +1,40 @@
 package main
 
 import (
+	"database/sql"
 	"fmt"
 	"log/slog"
 	"net/http"
-	"os"
-	"strings"
+
+	"github.com/heldercruvinel/transactions-routine/database/postgresql"
 )
 
 func main() {
 
+	db, err := postgresql.GetConnection()
+	if err != nil {
+		slog.Error("starting server failed", slog.String("error", err.Error()))
+		panic(err)
+	}
+
 	server := http.NewServeMux()
 
-	server.HandleFunc("GET /hello/{name}/{$}", helloHandler)
+	server.HandleFunc("GET /health/{$}", healthHandler(db))
 
 	if err := http.ListenAndServe(":8080", server); err != nil {
-		slog.Error(slog.String("error", err.Error()).String())
+		slog.Error("error to start the server", slog.String("error", err.Error()))
 	}
 }
 
-func helloHandler(w http.ResponseWriter, r *http.Request) {
-	sparams := r.URL.Query()
-	pathParam := r.PathValue("name")
+func healthHandler(db *sql.DB) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		dbStatus := "on"
 
-	databaseUser := os.Getenv("DATABASE_USER")
-	databasePassword := os.Getenv("DATABASE_PASSWORD")
+		err := db.Ping()
+		if err != nil {
+			dbStatus = "off"
+		}
 
-	fmt.Println(databaseUser, databasePassword)
-
-	text := sparams["teste"]
-	w.Write([]byte(strings.Join(text, "/") + pathParam + databaseUser + databasePassword))
+		fmt.Fprintf(w, "dbStatus: %s", dbStatus)
+	}
 }

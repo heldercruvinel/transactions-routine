@@ -12,27 +12,34 @@ services:
     ports:
       - "8080:8080/tcp"
     environment:
+      DATABASE_HOST: "postgresql"
       DATABASE_USER: ${DATABASE_USER:-postgres}
       DATABASE_PASSWORD: ${DATABASE_PASSWORD:-postgres}
     entrypoint: api
     depends_on:
       postgresql:
         condition: service_started
+    networks:
+      - backend
 
   postgresql:
     container_name: postgresql
     image: postgres:18.0-alpine3.22
     restart: always
-    # set shared memory limit when using docker compose
     shm_size: 128mb
-    # or set shared memory limit when deploy via swarm stack
-    #volumes:
-    #  - type: tmpfs
-    #    target: /dev/shm
-    #    tmpfs:
-    #      size: 134217728 # 128*2^20 bytes = 128Mb
     ports:
       - "5432:5432"
     environment:
+      POSTGRES_DB: "financial"
       POSTGRES_USER: "${DATABASE_USER:-postgres}"
       POSTGRES_PASSWORD: "${DATABASE_PASSWORD:-postgres}"
+    networks:
+      - backend
+    volumes:
+      - db:/var/lib/postgresql/data
+
+networks:
+  backend:
+
+volumes:
+  db:
