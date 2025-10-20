@@ -44,40 +44,44 @@ For the purpose of correctly running the project, we have to follow these steps:
 <h3 id="docker"></br>Using <bold><code>Docker</code></bold> commands.</h3>
 
 >
-> <h4 id="env-docker"></br>Setting up the environment variables (Works with Docker Compose too)</h4>
+> <h4 id="env-docker"></br>- Setting up the environment variables (Works with Docker Compose too)</h4>
 >
+> <sub>Shell</sub>
 > ```bash
-> # Using Linux we can use Bash or Zsh
-> $ bash
-> or
-> $ zsh
+> $ export DATABASE_HOST="postgresql"
 > $ export DATABASE_USER=[my_database_user]
 > $ export DATABASE_PASSWORD=[my_database_password]
 > ```
-> 
+> <sub>Command Prompt</sub>
 > ```powershell
-> # Using Windows we can use Command Prompt or PowerShell
-> # Command Prompt
+> $ setx DATABASE_HOST "postgresql"
 > $ setx DATABASE_USER "[my_database_user]"
 > $ setx DATABASE_PASSWORD "[my_database_password]"
-> or
-> # PowerShell
+> ```
+> <sub>PowerShell</sub>
+> ```powershell
+> $ [Environment]::SetEnvironmentVariable("DATABASE_HOST", "postgresql", "User")
 > $ [Environment]::SetEnvironmentVariable("DATABASE_USER", "[my_database_user]", "User")
 > $ [Environment]::SetEnvironmentVariable("DATABASE_PASSWORD", "[my_database_password]", "User")
 > ```
 >
-> <h4 id="postgresql-container"></br>Running the <bold><code>postgresql</code></bold> container</h4>
-> 
+> <sub>Creating the docker network</sub>
 > ```bash
-> $ docker run --name postgresql -p 5432:5432/tcp -e POSTGRES_PASSWORD=$DATABASE_PASSWORD -e POSTGRES_USER=$DATABASE_USER -d postgres:18.0-alpine3.22
+> $ docker network create -d bridge backend
 > ```
 >
-> <h4 id="api-container"></br>Bulding and running the <bold><code>api</code></bold> container</h4>
+> <h4 id="postgresql-container"></br>- Running the <bold><code>postgresql</code></bold> container</h4>
+> 
+> ```bash
+> $ docker run --name postgresql -v db:/var/lib/postgresql/data --network=backend -p 5432:5432 -e POSTGRES_DB="financial" -e POSTGRES_PASSWORD=$DATABASE_PASSWORD -e POSTGRES_USER=$DATABASE_USER -d postgres:18.0-alpine3.22
+> ```
+>
+> <h4 id="api-container"></br>- Bulding and running the <bold><code>api</code></bold> container</h4>
 >
 > ```bash
 > ## Inside the cloned repository folder
 > $ docker build -t api .
-> $ docker run -d --name api -e DATABASE_USER=$DATABASE_USER -e DATABASE_PASSWORD=$DATABASE_PASSWORD -p 8080:8080/tcp -it api
+> $ docker run -d --name api --network=backend -p 8080:8080 -e DATABASE_HOST=$DATABASE_HOST -e DATABASE_USER=$DATABASE_USER -e DATABASE_PASSWORD=$DATABASE_PASSWORD -it api api
 > ```
 >
 > </br>
@@ -85,40 +89,39 @@ For the purpose of correctly running the project, we have to follow these steps:
 <h3 id="docker-compose"></br>Using <bold><code>Docker Compose</code></bold> commands.</h3>
 
 >
-> <h4 id="env-docker-compose"></br>Setting up the environment variables</h4>
+> <h4 id="env-docker-compose"></br>- Setting up the environment variables</h4>
 >
 > Create a **`.env`** file and set the environmet variables inside it.
 > 
+> <sub>Shell</sub>
 > ```bash
-> # Using Linux we can use Bash or Zsh
-> $ bash
-> or
-> $ zsh
 > $ touch .env
+> $ echo DATABASE_HOST=postgresql > .env
 > $ echo DATABASE_USER=[my_database_user] >> .env
 > $ echo DATABASE_PASSWORD=[my_database_password] >> .env 
 >
 > ```
-> 
+> <sub>Command Prompt</sub>
 > ```powershell
-> # Using Windows we can use Command Prompt or PowerShell
-> # Command Prompt
 > $ type nul > .env
+> $ echo DATABASE_HOST=postgresql >> .env
 > $ echo DATABASE_USER=[my_database_user] >> .env
 > $ echo DATABASE_PASSWORD=[my_database_password] >> .env
-> or
-> # PowerShell
+> ```
+> <sub>PowerShell</sub>
+> ```powershell
 > $ New-Item -Path .env -ItemType File -Force
+> $ Add-Content -Path .env -Value "DATABASE_HOST=postgresql"
 > $ Add-Content -Path .env -Value "DATABASE_USER=[my_database_user]"
 > $ Add-Content -Path .env -Value "DATABASE_PASSWORD=[my_database_password]"
 > ```
 >
-> <h4 id="services"></br>Running all services</h4>
+> <h4 id="services"></br>- Running all services</h4>
 >
-> Just running the **`api`** service, will run the **`postgresql`** service automatically.
+> When executing this command, the **`api`** service will wait the **`postgresql`** service automatically.
 > 
 > ```bash
-> $ docker compose up -d api
+> $ docker compose up -d
 > ```
 > 
 > </br>
@@ -144,3 +147,11 @@ For the purpose of correctly running the project, we have to follow these steps:
 ## </br>License
 
 [MIT License](https://choosealicense.com/licenses/mit/)
+
+
+
+
+
+docker network create -d bridge my-net
+
+
