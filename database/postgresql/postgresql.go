@@ -65,7 +65,6 @@ func checkDatabaseStructure(db *sql.DB) error {
 			CREATE TABLE financial.transactions.operations_types (
 				id INT4 GENERATED ALWAYS AS IDENTITY,
 				description VARCHAR(50) NOT NULL,
-				signal INT4 NOT NULL,
 				CONSTRAINT pk_operations_types PRIMARY KEY(id)
 			);
 
