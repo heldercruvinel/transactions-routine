@@ -1,6 +1,7 @@
 package transactions
 
 import (
+	"errors"
 	"log/slog"
 	"time"
 
@@ -58,7 +59,12 @@ func Insert(transaction Transaction, db DB) (Transaction, error) {
 	}
 
 	// Validate and apply the signal rules
-	transaction.Amount = amountRules[transaction.OperationID](transaction.Amount)
+	rule, ok := amountRules[transaction.OperationID]
+	if !ok {
+		slog.Error("error to find operation rule")
+		return Transaction{}, errors.New("error to find operation rule")
+	}
+	transaction.Amount = rule(transaction.Amount)
 
 	// Database Transaction insert
 	result, err := db.Insert(transaction)

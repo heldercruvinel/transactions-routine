@@ -16,7 +16,11 @@ func GetConnection() (*sql.DB, error) {
 	// Set the environment variables and create a connectinon string
 	databaseUser := os.Getenv("DATABASE_USER")
 	databasePassword := os.Getenv("DATABASE_PASSWORD")
-	connStr := fmt.Sprintf("user=%s password=%s host=postgresql dbname=financial sslmode=disable", databaseUser, databasePassword)
+
+	// TODO: RESOLVER ESSE PROBLEMA DO HOST POSTGRESQL
+	// connStr := fmt.Sprintf("user=%s password=%s host=postgresql dbname=financial sslmode=disable", databaseUser, databasePassword)
+
+	connStr := fmt.Sprintf("user=%s password=%s host=localhost dbname=financial sslmode=disable", databaseUser, databasePassword)
 
 	// Open a connection with the database and return the *sql.DB instance
 	db, err := sql.Open("postgres", connStr)
@@ -89,6 +93,10 @@ func checkDatabaseStructure(db *sql.DB) error {
 				created_at TIMESTAMP DEFAULT NOW() NOT NULL,
 				CONSTRAINT pk_transactions PRIMARY KEY(id)
 			);
+
+			ALTER TABLE financial.transactions.transactions
+			ADD CONSTRAINT fk_operation_id FOREIGN KEY (operation_id) REFERENCES financial.transactions.operations_types (id),
+			ADD CONSTRAINT fk_account_id FOREIGN KEY (account_id) REFERENCES financial.transactions.accounts (id);
 		`)
 		if err != nil {
 			slog.Error("failed when to create the database structure", slog.String("error", err.Error()))
