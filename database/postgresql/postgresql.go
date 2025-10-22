@@ -15,8 +15,8 @@ func GetConnection() (*sql.DB, error) {
 
 	// Set the environment variables and create a connectinon string
 	databaseHost := os.Getenv("DATABASE_HOST")
-	databaseUser := os.Getenv("POSTGRES_USER")
-	databasePassword := os.Getenv("POSTGRES_PASSWORD")
+	databaseUser := os.Getenv("DATABASE_USER")
+	databasePassword := os.Getenv("DATABASE_PASSWORD")
 
 	// TODO: RESOLVER ESSE PROBLEMA DO HOST POSTGRESQL
 
