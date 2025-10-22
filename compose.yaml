@@ -13,8 +13,8 @@ services:
       - "8080:8080/tcp"
     environment:
       DATABASE_HOST: "${DATABASE_HOST:-postgresql}"
-      DATABASE_USER: "${POSTGRES_USER:-postgres}"
-      DATABASE_PASSWORD: "${POSTGRES_PASSWORD:-postgres}"
+      POSTGRES_USER: "${POSTGRES_USER:-postgres}"
+      POSTGRES_PASSWORD: "${POSTGRES_PASSWORD:-postgres}"
     entrypoint: api
     depends_on:
       postgresql:
