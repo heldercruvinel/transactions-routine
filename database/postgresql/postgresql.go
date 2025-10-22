@@ -14,13 +14,13 @@ func GetConnection() (*sql.DB, error) {
 	var result int
 
 	// Set the environment variables and create a connectinon string
-	databaseUser := os.Getenv("DATABASE_USER")
-	databasePassword := os.Getenv("DATABASE_PASSWORD")
+	databaseHost := os.Getenv("DATABASE_HOST")
+	databaseUser := os.Getenv("POSTGRES_USER")
+	databasePassword := os.Getenv("POSTGRES_PASSWORD")
 
 	// TODO: RESOLVER ESSE PROBLEMA DO HOST POSTGRESQL
-	// connStr := fmt.Sprintf("user=%s password=%s host=postgresql dbname=financial sslmode=disable", databaseUser, databasePassword)
 
-	connStr := fmt.Sprintf("user=%s password=%s host=localhost dbname=financial sslmode=disable", databaseUser, databasePassword)
+	connStr := fmt.Sprintf("user=%s password=%s host=%s dbname=financial sslmode=disable", databaseUser, databasePassword, databaseHost)
 
 	// Open a connection with the database and return the *sql.DB instance
 	db, err := sql.Open("postgres", connStr)
@@ -72,11 +72,11 @@ func checkDatabaseStructure(db *sql.DB) error {
 				CONSTRAINT pk_operations_types PRIMARY KEY(id)
 			);
 
-			INSERT INTO financial.transactions.operations_types (description, signal) VALUES 
-			('Normal Puchase', -1),
-			('Purchase with installments',-1),
-			('Withdrawal', -1),
-			('Credit voucher', 1);
+			INSERT INTO financial.transactions.operations_types (description) VALUES 
+			('Normal Puchase'),
+			('Purchase with installments'),
+			('Withdrawal'),
+			('Credit voucher');
 
 			CREATE TABLE financial.transactions.accounts (
 				id UUID DEFAULT gen_random_uuid(),
