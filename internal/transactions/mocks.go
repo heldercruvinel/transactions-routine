@@ -10,7 +10,9 @@ var transactionRepo []Transaction = []Transaction{
 		ID:          func() *string { v := "f1f7f26a-897e-4cc0-b30f-3a4dba00fcc4"; return &v }(),
 		OperationID: 1,
 		AccountID:   "4bf92821-1117-4fcf-aeef-55070ecca3bd",
-		Amount:      150.00,
+		Amount:      -150.00,
+		Balance:     -150.00,
+		Closed:      false,
 		CreatedAt:   func() *time.Time { v := time.Now(); return &v }(),
 	},
 }
@@ -35,6 +37,14 @@ func (db *MockDB) Insert(account Transaction) (Transaction, error) {
 	return db.funcInsert(account)
 }
 
+func (db *MockDB) List(closed bool) ([]Transaction, error) {
+	return transactionRepo, nil
+}
+
+func (db *MockDB) Update(transaction Transaction) error {
+	return nil
+}
+
 func funcInsert(errorInsert string) func(a Transaction) (Transaction, error) {
 	if errorInsert != "" {
 		return func(a Transaction) (Transaction, error) {
@@ -49,6 +59,8 @@ func funcInsert(errorInsert string) func(a Transaction) (Transaction, error) {
 			OperationID: a.OperationID,
 			AccountID:   a.AccountID,
 			Amount:      a.Amount,
+			Balance:     a.Balance,
+			Closed:      a.Closed,
 		}, nil
 	}
 }

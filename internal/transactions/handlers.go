@@ -6,10 +6,13 @@ import (
 	"time"
 
 	"github.com/go-playground/validator/v10"
+	"github.com/heldercruvinel/transactions-routine/numbers"
 )
 
 type DB interface {
 	Insert(transaction Transaction) (Transaction, error)
+	List(closed bool) ([]Transaction, error)
+	Update(transaction Transaction) error
 }
 
 type Transaction struct {
@@ -17,6 +20,8 @@ type Transaction struct {
 	OperationID int        `json:"operation_id" validate:"number,required"`
 	AccountID   string     `json:"account_id" validate:"uuid,required"`
 	Amount      float64    `json:"amount" validate:"numeric,required"`
+	Balance     float64    `json:"balance"`
+	Closed      bool       `json:"closed"`
 	CreatedAt   *time.Time `json:"created_at"`
 }
 
@@ -58,6 +63,19 @@ func Insert(transaction Transaction, db DB) (Transaction, error) {
 		return Transaction{}, validateErr
 	}
 
+	result, err := CalcBalance(transaction, db)
+	if err != nil {
+		slog.Error("error to calcualte positive balance", slog.String("error", err.Error()))
+		return Transaction{}, err
+	}
+
+	return result, nil
+
+}
+
+// Method responsible for calc the balance and update the opened transactions
+func CalcBalance(transaction Transaction, db DB) (Transaction, error) {
+
 	// Validate and apply the signal rules
 	rule, ok := amountRules[transaction.OperationID]
 	if !ok {
@@ -66,10 +84,47 @@ func Insert(transaction Transaction, db DB) (Transaction, error) {
 	}
 	transaction.Amount = rule(transaction.Amount)
 
-	// Database Transaction insert
+	if transaction.OperationID < 4 {
+		transaction.Balance = transaction.Amount
+		transaction.Closed = false
+	} else {
+		// List all tuples that closed is false and OperationID <> 4
+		initialBalance := transaction.Amount
+
+		transctionList, err := db.List(false)
+		if err != nil {
+			slog.Error("error to calcualte positive balance", slog.String("error", err.Error()))
+			return Transaction{}, err
+		}
+
+		for _, t := range transctionList {
+
+			// Partial disccount
+			if (initialBalance + t.Balance) <= 0 {
+				t.Balance = numbers.FormatToTwoDecimalPlaces(initialBalance + t.Balance)
+				transaction.Balance = 0
+				transaction.Closed = true
+				initialBalance = 0
+			} else {
+				// Total disccount
+				initialBalance = numbers.FormatToTwoDecimalPlaces(initialBalance + t.Balance)
+				t.Closed = true
+				t.Balance = 0
+			}
+
+			err := db.Update(t)
+			if err != nil {
+				slog.Error("error to update old balances", slog.String("error", err.Error()))
+				return Transaction{}, err
+			}
+		}
+
+		transaction.Balance = numbers.FormatToTwoDecimalPlaces(initialBalance)
+	}
+
 	result, err := db.Insert(transaction)
 	if err != nil {
-		slog.Error("error to create new transacation", slog.String("error", err.Error()))
+		slog.Error("error to insert positive balance", slog.String("error", err.Error()))
 		return Transaction{}, err
 	}
 

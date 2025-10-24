@@ -27,6 +27,8 @@ func TestInsertTransactionSuccess(t *testing.T) {
 		assert.Equal(t, transaction.OperationID, result.OperationID)
 		assert.Equal(t, transaction.AccountID, result.AccountID)
 		assert.Equal(t, transaction.Amount, result.Amount)
+		assert.Equal(t, -50.00, result.Balance)
+		assert.Equal(t, false, result.Closed)
 	})
 
 	t.Run("Insert Transaction with positive value sucess", func(t *testing.T) {
@@ -152,5 +154,82 @@ func TestInsertTransactionError(t *testing.T) {
 
 		assert.Empty(t, result)
 		assert.Equal(t, "Amount", validationErrors[0].Field())
+	})
+}
+
+func TestCalcBalanceSuccess(t *testing.T) {
+
+	mockedDB := GetMockedDB("")
+
+	t.Run("Should return negative for case 1", func(t *testing.T) {
+
+		transaction := Transaction{
+			OperationID: 1,
+			AccountID:   "dbfc23f8-ffd2-4aaf-ba01-e6eb1213bfbd",
+			Amount:      -50.00,
+		}
+
+		result, err := CalcBalance(transaction, &mockedDB)
+		if err != nil {
+			t.Fatalf("Should not return err")
+		}
+
+		assert.Equal(t, -50.00, result.Balance)
+		assert.False(t, result.Closed)
+
+	})
+
+	t.Run("Should return negative for case 2", func(t *testing.T) {
+
+		transaction := Transaction{
+			OperationID: 2,
+			AccountID:   "fac662b5-cb4b-497d-a783-a5c1b9facc7f",
+			Amount:      -5000.00,
+		}
+
+		result, err := CalcBalance(transaction, &mockedDB)
+		if err != nil {
+			t.Fatalf("Should not return err")
+		}
+
+		assert.Equal(t, -5000.00, result.Balance)
+		assert.False(t, result.Closed)
+
+	})
+
+	t.Run("Should return negative for case 3", func(t *testing.T) {
+
+		transaction := Transaction{
+			OperationID: 2,
+			AccountID:   "fac662b5-cb4b-497d-a783-a5c1b9facc7f",
+			Amount:      -173.23,
+		}
+
+		result, err := CalcBalance(transaction, &mockedDB)
+		if err != nil {
+			t.Fatalf("Should not return err")
+		}
+
+		assert.Equal(t, -173.23, result.Balance)
+		assert.False(t, result.Closed)
+
+	})
+
+	t.Run("Should return positive for case 4", func(t *testing.T) {
+
+		transaction := Transaction{
+			OperationID: 4,
+			AccountID:   "fac662b5-cb4b-497d-a783-a5c1b9facc7f",
+			Amount:      173.23,
+		}
+
+		result, err := CalcBalance(transaction, &mockedDB)
+		if err != nil {
+			t.Fatalf("Should not return err")
+		}
+
+		assert.Equal(t, 0.0, result.Balance)
+		assert.True(t, result.Closed)
+
 	})
 }
