@@ -21,6 +21,7 @@ func GetConnection() (*sql.DB, error) {
 	// TODO: RESOLVER ESSE PROBLEMA DO HOST POSTGRESQL
 
 	connStr := fmt.Sprintf("user=%s password=%s host=%s dbname=financial sslmode=disable", databaseUser, databasePassword, databaseHost)
+	fmt.Println(connStr)
 
 	// Open a connection with the database and return the *sql.DB instance
 	db, err := sql.Open("postgres", connStr)
@@ -90,6 +91,8 @@ func checkDatabaseStructure(db *sql.DB) error {
 				operation_id INT4, 
 				account_id UUID NOT NULL,
 				amount DECIMAL(10,2) NOT NULL,
+				balance DECIMAL(10,2) NOT NULL,
+				closed BOOL NOT NULL DEFAULT FALSE,
 				created_at TIMESTAMP DEFAULT NOW() NOT NULL,
 				CONSTRAINT pk_transactions PRIMARY KEY(id)
 			);
